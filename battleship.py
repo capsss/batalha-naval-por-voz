@@ -7,19 +7,24 @@
 #pra rodar
 # python3 battleship.py
 
+#para tocar os sons instalar o vlc
 
+# "cvlc audio.mp3 --loop"
+# "cvlc --play-and-exit audio.mp3"
+
+# Links uteis:
+# https://realpython.com/python-speech-recognition/
 
 #coisas para fazer:
 #
 #FAZER  -   implementar a fase de posicionamento das pecas (atualmente esta indo com posicionamento aleatorio)
 #PRONTO -   estabelecer uma especie de timeout pra entrada de voz, tem hora que demora de mais. era melhor reiniciar o microfone e pedir pra falar de novo
 #PRONTO -   trocar os prints por saidas de audio pra fazer mais sentido com a coisa toda
-#PRONTO -   implementar uma opção por voz para "jogar de novo", pra nao precisa executar o codigo na mao outra vez
+#PRONTO -   implementar uma opcao por voz para "jogar de novo", pra nao precisa executar o codigo na mao outra vez
 #FAZER  -   pedir pro usuario escolher outra posicao caso tenha escolhida alguma invalida
 #FAZER  -   verificar o reconhecimento de voz de acordo com o "three alguma coisa" que tem nos slides
 #FAZER  -   trocar a reproducao de audio por uma biblioteca melhor, usar o SO pra isso eh lento, pesado, e ainda por cima abre uma puta janela chata por cima
 #PRONTO -   implementar um segundo jogador para automatizar a coisa toda
-
 
 
 from selenium import webdriver
@@ -38,14 +43,15 @@ def gravar_mensagem_texto_em_audio(mensagem, nome):
 
 #reproduz audio
 def tocar_audio(arquivo):
-    os.system(arquivo + '.mp3')
+    os.system('cvlc --play-and-exit ' + arquivo + '.mp3')
+    #os.system(arquivo + '.mp3')
 
 #escuta o audio e retorna o que foi reconhecido
 def reconhecer_audio(mensagem_inicial='falai', mensagem_ajuda='nao entendi, fala direito'):
     recognizer = sr.Recognizer()
     with sr.Microphone() as source:
         print(mensagem_inicial)
-        # recognizer.adjust_for_ambient_noise(source)
+        recognizer.adjust_for_ambient_noise(source)  #reduz ruido do ambiente
         try:
             audio = recognizer.listen(source, 5, 5)
             entrada_por_audio = recognizer.recognize_google(audio, language='pt-BR')
@@ -197,19 +203,22 @@ def segundo_jogador_automatico(url):
             estado = "perdeu"
 
     navegador.close()
-
-# gravar_mensagem_texto_em_audio('Bem vindo ao grande e inovador batalha naval. Que original... A qualquer momento diga "repetir" para que eu fale a última instrução novamente. Para desistir, diga "desistir". Para começar, diga "começar".', 'mensagem_inicial')
-# gravar_mensagem_texto_em_audio('Iniciando o jogo...', 'inicio_de_jogo')
-# gravar_mensagem_texto_em_audio('Diga uma letra e um número para escolher a casa onde quer atirar, por exemplo: "a7", ou "j2".', 'intrucoes')
-# gravar_mensagem_texto_em_audio('Sua vez.', 'sua_vez')
-# gravar_mensagem_texto_em_audio('E não é que você é bom nesse bagulho mesmo? Parabéns bixo. Ganhou bonito eim', 'vencedor')
-# gravar_mensagem_texto_em_audio('Mas é ruim demais mesmo eim, perdeu de lavada!', 'perdedor')
-# gravar_mensagem_texto_em_audio('Vixi, o outro cara arregou? Só assim pra você ganhar mesmo...', 'wo')
-# gravar_mensagem_texto_em_audio('Tem certeza que você quer arregar. Seu arregãozinho', 'vai_arregar')
-# gravar_mensagem_texto_em_audio('Beleza então, arregão', 'arregao')
-# gravar_mensagem_texto_em_audio('Sinto que você quer jogar mais uma não é mesmo? Posso começar uma nova partida?', 'reinicio')
-# gravar_mensagem_texto_em_audio('Se cuida então', 'despedida')
-
+'''
+gravar_mensagem_texto_em_audio('Bem vindo ao grande e inovador batalha naval. Que original... A qualquer momento diga "repetir" para que eu fale a última instrução novamente. Para desistir, diga "desistir". Para começar, diga "começar".', 'mensagem_inicial')
+gravar_mensagem_texto_em_audio('Iniciando o jogo...', 'inicio_de_jogo')
+'''
+gravar_mensagem_texto_em_audio('Diga uma letra e um número para escolher a casa onde quer atirar, por exemplo: a7, ou j2.', 'instrucoes')
+'''
+gravar_mensagem_texto_em_audio('Sua vez.', 'sua_vez')
+gravar_mensagem_texto_em_audio('nao entendi, fala direito, .', 'nao_entendi')
+gravar_mensagem_texto_em_audio('E não é que você é bom nesse bagulho mesmo? Parabéns bixo. Ganhou bonito eim', 'vencedor')
+gravar_mensagem_texto_em_audio('Mas é ruim demais mesmo eim, perdeu de lavada!', 'perdedor')
+gravar_mensagem_texto_em_audio('Vixi, o outro cara arregou? Só assim pra você ganhar mesmo...', 'wo')
+gravar_mensagem_texto_em_audio('Tem certeza que você quer arregar. Seu arregãozinho', 'vai_arregar')
+gravar_mensagem_texto_em_audio('Beleza então, arregão', 'arregao')
+gravar_mensagem_texto_em_audio('Sinto que você quer jogar mais uma não é mesmo? Posso começar uma nova partida?', 'reinicio')
+gravar_mensagem_texto_em_audio('Se cuida então', 'despedida')
+'''
 tocar_audio('mensagem_inicial')
 quer_jogar = True
 while(quer_jogar):
@@ -288,6 +297,7 @@ while(quer_jogar):
                     campo[1].click()
             else:
                 print('nao foi reconhecido')
+                tocar_audio('nao_entendi')
         time.sleep(1)
 
         if lista_da_fase_atual[6].is_displayed(): #Oponente disparar em. Por favor, aguarde.
