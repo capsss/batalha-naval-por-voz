@@ -35,6 +35,27 @@ import threading
 import os
 import time
 
+#gerenciador do icone de reconhecimento
+def gerenciador_icone_audio():
+    from tkinter import Tk, Canvas
+
+    janela = Tk()
+    janela.geometry('100x100')
+    janela.attributes("-topmost", True)
+
+    canvas = Canvas(janela, height=100, width=100)
+    circulo = canvas.create_oval(10,10,90,90)
+    canvas.pack()
+
+    while quer_jogar:
+        if estado_microfone == 'escutando':
+            canvas.itemconfig(circulo, fill='gray')
+        if estado_microfone == 'reconhecido':
+            canvas.itemconfig(circulo, fill='green')
+        if estado_microfone == 'invalido':
+            canvas.itemconfig(circulo, fill='red')
+        janela.update()
+
 #grava texto em audio
 def gravar_mensagem_texto_em_audio(mensagem, nome):
     from gtts import gTTS
@@ -43,8 +64,8 @@ def gravar_mensagem_texto_em_audio(mensagem, nome):
 
 #reproduz audio
 def tocar_audio(arquivo):
-    os.system('cvlc --play-and-exit ' + arquivo + '.mp3')
-    #os.system(arquivo + '.mp3')
+    # os.system('cvlc --play-and-exit ' + arquivo + '.mp3')
+    os.system(arquivo + '.mp3')
 
 #escuta o audio e retorna o que foi reconhecido
 def reconhecer_audio(mensagem_inicial='falai', mensagem_ajuda='nao entendi, fala direito'):
@@ -54,7 +75,7 @@ def reconhecer_audio(mensagem_inicial='falai', mensagem_ajuda='nao entendi, fala
         recognizer.adjust_for_ambient_noise(source)  #reduz ruido do ambiente
         try:
             audio = recognizer.listen(source, 5, 5)
-            entrada_por_audio = recognizer.recognize_google(audio, language='pt-BR')
+            entrada_por_audio = recognizer.recognize_google(audio, language='pt-BR')#, show_all=True)
             print('reconhecido:', entrada_por_audio)
             return entrada_por_audio
         except:
@@ -203,34 +224,44 @@ def segundo_jogador_automatico(url):
             estado = "perdeu"
 
     navegador.close()
-'''
-gravar_mensagem_texto_em_audio('Bem vindo ao grande e inovador batalha naval. Que original... A qualquer momento diga "repetir" para que eu fale a última instrução novamente. Para desistir, diga "desistir". Para começar, diga "começar".', 'mensagem_inicial')
-gravar_mensagem_texto_em_audio('Iniciando o jogo...', 'inicio_de_jogo')
-'''
-gravar_mensagem_texto_em_audio('Diga uma letra e um número para escolher a casa onde quer atirar, por exemplo: a7, ou j2.', 'instrucoes')
-'''
-gravar_mensagem_texto_em_audio('Sua vez.', 'sua_vez')
-gravar_mensagem_texto_em_audio('nao entendi, fala direito, .', 'nao_entendi')
-gravar_mensagem_texto_em_audio('E não é que você é bom nesse bagulho mesmo? Parabéns bixo. Ganhou bonito eim', 'vencedor')
-gravar_mensagem_texto_em_audio('Mas é ruim demais mesmo eim, perdeu de lavada!', 'perdedor')
-gravar_mensagem_texto_em_audio('Vixi, o outro cara arregou? Só assim pra você ganhar mesmo...', 'wo')
-gravar_mensagem_texto_em_audio('Tem certeza que você quer arregar. Seu arregãozinho', 'vai_arregar')
-gravar_mensagem_texto_em_audio('Beleza então, arregão', 'arregao')
-gravar_mensagem_texto_em_audio('Sinto que você quer jogar mais uma não é mesmo? Posso começar uma nova partida?', 'reinicio')
-gravar_mensagem_texto_em_audio('Se cuida então', 'despedida')
-'''
+
+# gravar_mensagem_texto_em_audio('Bem vindo ao grande e inovador batalha naval. Que original... A qualquer momento diga "repetir" para que eu fale a última instrução novamente. Para desistir, diga "desistir". Para começar, diga "começar".', 'mensagem_inicial')
+# gravar_mensagem_texto_em_audio('Iniciando o jogo...', 'inicio_de_jogo')
+# gravar_mensagem_texto_em_audio('Diga uma letra e um número para escolher a casa onde quer atirar, por exemplo: a7, ou j2.', 'instrucoes')
+# gravar_mensagem_texto_em_audio('Sua vez.', 'sua_vez')
+# gravar_mensagem_texto_em_audio('nao entendi, fala direito, .', 'nao_entendi')
+# gravar_mensagem_texto_em_audio('E não é que você é bom nesse bagulho mesmo? Parabéns bixo. Ganhou bonito eim', 'vencedor')
+# gravar_mensagem_texto_em_audio('Mas é ruim demais mesmo eim, perdeu de lavada!', 'perdedor')
+# gravar_mensagem_texto_em_audio('Vixi, o outro cara arregou? Só assim pra você ganhar mesmo...', 'wo')
+# gravar_mensagem_texto_em_audio('Tem certeza que você quer arregar. Seu arregãozinho', 'vai_arregar')
+# gravar_mensagem_texto_em_audio('Beleza então, arregão', 'arregao')
+# gravar_mensagem_texto_em_audio('Sinto que você quer jogar mais uma não é mesmo? Posso começar uma nova partida?', 'reinicio')
+# gravar_mensagem_texto_em_audio('Se cuida então', 'despedida')
+
+
 tocar_audio('mensagem_inicial')
+estado_microfone = 'escutando'
 quer_jogar = True
+
+#inicia a thread que gerencia o icone de reconhecimento de audio
+t = threading.Thread(target=gerenciador_icone_audio)
+t.daemon = True
+t.start()
+
 while(quer_jogar):
     while(quer_jogar):
         entrada_por_audio = reconhecer_audio()
         if(entrada_por_audio == 'começar'):
+            estado_microfone = 'reconhecido'
             break
         if(entrada_por_audio == 'inicializar'):
+            estado_microfone = 'reconhecido'
             break
         if(entrada_por_audio == 'iniciar'):
+            estado_microfone = 'reconhecido'
             break
         if(entrada_por_audio == 'vai porra'):
+            estado_microfone = 'reconhecido'
             break
 
     tocar_audio('inicio_de_jogo')
@@ -272,19 +303,25 @@ while(quer_jogar):
     while(not lista_da_fase_atual[3].is_displayed()): #O jogo comecou. Seu tiro.
         time.sleep(1)
 
-    tocar_audio('instrucoes')
+    # tocar_audio('instrucoes')
     estado = "sua vez"
 
+    #toda a partida em si acontece dentro desse while
     while(estado == "sua vez" or estado == "vez do adversario"):
         if estado == "sua vez":
             tocar_audio('sua_vez')
+            estado_microfone = 'escutando'
             audio_reconhecido = reconhecer_audio()
             if audio_reconhecido != None:
                 if audio_reconhecido == 'desistir' or audio_reconhecido == 'abandonar':
+                    estado_microfone = 'reconhecido'
+                    time.sleep(1)
                     print('vai arregar?')
+                    estado_microfone = 'escutando'
                     tocar_audio('vai_arregar')
                     confirmar_desistencia = reconhecer_audio()
                     if confirmar_desistencia == 'sim':
+                        estado_microfone = 'reconhecido'
                         estado = "desistiu"
                         tocar_audio('arregao')
                         break
@@ -293,9 +330,11 @@ while(quer_jogar):
                     coordenadas = mapear_coordenadas(audio_reconhecido)
                 print(coordenadas)
                 if coordenadas[0] != None and coordenadas[1] != None:
+                    estado_microfone = 'reconhecido'
                     campo = navegador.find_elements_by_xpath('//div[@data-y="' +str(coordenadas[1] - 1) + '"] [@data-x="' +str(coordenadas[0] -1) + '"]')
                     campo[1].click()
             else:
+                estado_microfone = 'invalido'
                 print('nao foi reconhecido')
                 tocar_audio('nao_entendi')
         time.sleep(1)
@@ -317,7 +356,7 @@ while(quer_jogar):
     #se for o ganhador
     if estado == "ganhou":
         print('ganhador')
-        tocar_audio('ganhador')
+        tocar_audio('vencedor')
     if estado == "perdeu":
         print('perdedor')
         tocar_audio('perdedor')
@@ -329,6 +368,7 @@ while(quer_jogar):
 
     tocar_audio('reinicio')
     resposta = reconhecer_audio()
+    time.sleep(5)
     if resposta != 'sim' and resposta != 'pode':
         quer_jogar = False
         tocar_audio('despedida')
