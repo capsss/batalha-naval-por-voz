@@ -17,14 +17,15 @@
 
 #coisas para fazer:
 #
-#FAZER  -   implementar a fase de posicionamento das pecas (atualmente esta indo com posicionamento aleatorio)
+#DESC   -   implementar a fase de posicionamento das pecas (atualmente esta indo com posicionamento aleatorio)
 #PRONTO -   estabelecer uma especie de timeout pra entrada de voz, tem hora que demora de mais. era melhor reiniciar o microfone e pedir pra falar de novo
 #PRONTO -   trocar os prints por saidas de audio pra fazer mais sentido com a coisa toda
 #PRONTO -   implementar uma opcao por voz para "jogar de novo", pra nao precisa executar o codigo na mao outra vez
 #FAZER  -   pedir pro usuario escolher outra posicao caso tenha escolhida alguma invalida
 #FAZER  -   verificar o reconhecimento de voz de acordo com o "three alguma coisa" que tem nos slides
-#FAZER  -   trocar a reproducao de audio por uma biblioteca melhor, usar o SO pra isso eh lento, pesado, e ainda por cima abre uma puta janela chata por cima
+#PRONTO -   trocar a reproducao de audio por uma biblioteca melhor, usar o SO pra isso eh lento, pesado, e ainda por cima abre uma puta janela chata por cima
 #PRONTO -   implementar um segundo jogador para automatizar a coisa toda
+#PRONTO -   implementar icone para indicar a hora de falar e se o audio foi ou nao reconhecido
 
 
 from selenium import webdriver
