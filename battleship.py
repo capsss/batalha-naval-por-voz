@@ -85,6 +85,8 @@ def reconhecer_audio(mensagem_inicial='falai', mensagem_ajuda='nao entendi, fala
 
 #mapeia o audio reconhecido pelo usuario para coordenadas no tabuleiro
 def mapear_coordenadas(audio_reconhecido):
+    if "-" in audio_reconhecido: #se reconhecer alguma palavra com hifem, eh melhorar ignorar mesmo que estaja certa
+        return [None, None]
     if " " in audio_reconhecido:
         duas_palavras = audio_reconhecido.split(' ')
         letra = duas_palavras[0][0]
@@ -144,7 +146,17 @@ def mapear_numero_para_numero(numero):
         'Oi' : 8,
         'oi' : 8,
         'nove' : 9,
-        'dez' : 10
+        'dez' : 10,
+        '1' : 1,
+        '2' : 2,
+        '3' : 3,
+        '4' : 4,
+        '5' : 5,
+        '6' : 6,
+        '7' : 7,
+        '8' : 8,
+        '9' : 9,
+        '10' : 10
     }
     return switcher.get(numero, None)
 
@@ -156,6 +168,12 @@ def concertar_cagada(texto_porcamento_reconhecido):
         return [2, 10]
     if texto_porcamento_reconhecido == 'assim': #(a, 5)
         return [1, 5]
+    if texto_porcamento_reconhecido == 'atriz': #(a, 3)
+        return [1, 3]
+    if texto_porcamento_reconhecido == 'denov': #(d, 9)
+        return [4, 9]
+    if texto_porcamento_reconhecido == 'bb-8': #(b, 8)
+        return [2, 8]
 
     if texto_porcamento_reconhecido == 'e 1' or texto_porcamento_reconhecido == 'E 1': #(e, 1)
         return [5, 1]
@@ -326,14 +344,18 @@ while(quer_jogar):
                         estado = "desistiu"
                         tocar_audio('arregao')
                         break
+                
                 coordenadas = concertar_cagada(audio_reconhecido)
                 if coordenadas == None:
                     coordenadas = mapear_coordenadas(audio_reconhecido)
-                print(coordenadas)
+                print('coordenadas:', coordenadas)
                 if coordenadas[0] != None and coordenadas[1] != None:
                     estado_microfone = 'reconhecido'
                     campo = navegador.find_elements_by_xpath('//div[@data-y="' +str(coordenadas[1] - 1) + '"] [@data-x="' +str(coordenadas[0] -1) + '"]')
                     campo[1].click()
+                else:
+                    estado_microfone = 'invalido'
+                    tocar_audio('nao_entendi')
             else:
                 estado_microfone = 'invalido'
                 print('nao foi reconhecido')
